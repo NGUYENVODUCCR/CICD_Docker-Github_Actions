@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    image: ${DOCKER_USERNAME}/myapp-backend:latest
+    container_name: myapp-backend
+    ports:
+      - "8080:8080"
+    restart: always
