@@ -1,18 +1,20 @@
-# Stage 1: Build
-FROM eclipse-temurin:21-jdk AS build
+# Sử dụng Python 3.11 slim
+FROM python:3.11-slim
+
+# Đặt thư mục làm việc
 WORKDIR /app
 
-COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
-RUN ./mvnw dependency:go-offline
+# Copy requirements trước để tối ưu cache
+COPY requirements.txt .
 
-COPY src ./src
-RUN ./mvnw package -DskipTests
+# Cài dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Stage 2: Runtime
-FROM eclipse-temurin:21-jre
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+# Copy toàn bộ code (bao gồm app.py và templates/)
+COPY . .
 
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Mở cổng 5000 (Flask mặc định)
+EXPOSE 5000
+
+# Chạy Flask app
+CMD ["python", "app.py"]
